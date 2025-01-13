@@ -67,7 +67,21 @@ void parse_csv(std::string filename, std::vector<Course> courses) {
     std::cerr << "Error opening file: " << filename << std::endl;
   }
 
+  std::string line;
+  std::getline(file, line);
 
+  while(std::getline(file, line))
+  {
+    std::vector<std::string> token = split(line, ',');
+    if(token.size() == 3)
+    {
+      std::string title = token[0];
+      int number_of_units = std::stoi(token[1]);
+      std::string quarter = token[2];
+      courses.push_back({title, number_of_units, quarter});
+    }
+  }
+  file.close();
 }
 
 /**
