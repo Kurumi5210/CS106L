@@ -26,7 +26,8 @@ const std::string COURSES_NOT_OFFERED_PATH = "student_output/courses_not_offered
  */
 struct Course {
   std::string title;
-  int number_of_units;
+  // int number_of_units;
+  std::string number_of_units;
   std::string quarter;
 };
 
@@ -44,6 +45,7 @@ struct Course {
  * Recall that #include literally copies and pastes file contents.
  */
 #include "utils.cpp"
+#include <cassert>
 
 /**
  * This function should populate the `courses` vector with structs of type
@@ -58,9 +60,8 @@ struct Course {
  * @param filename The name of the file to parse.
  * @param courses  A vector of courses to populate.
  */
-void parse_csv(std::string filename, std::vector<Course> courses) {
+void parse_csv(std::string filename, std::vector<Course>& courses) {
   /* (STUDENT TODO) Your code goes here... */
-  std::vector<Course> courses;
   std::ifstream file(filename);
 
   if(!file.is_open()){
@@ -73,15 +74,14 @@ void parse_csv(std::string filename, std::vector<Course> courses) {
   while(std::getline(file, line))
   {
     std::vector<std::string> token = split(line, ',');
-    if(token.size() == 3)
-    {
-      std::string title = token[0];
-      int number_of_units = std::stoi(token[1]);
-      std::string quarter = token[2];
-      courses.push_back({title, number_of_units, quarter});
-    }
+    std::string title = token[0];
+    // int number_of_units = std::stoi(token[1]);
+    std::string number_of_units = token[1]; // int 类型的number没法过assert
+    std::string quarter = token[2];
+    courses.push_back({title, number_of_units, quarter});
   }
   file.close();
+  return ;
 }
 
 /**
@@ -104,6 +104,33 @@ void parse_csv(std::string filename, std::vector<Course> courses) {
  */
 void write_courses_offered(std::vector<Course> all_courses) {
   /* (STUDENT TODO) Your code goes here... */
+  // assert(0);
+  std::ofstream output_file(COURSES_OFFERED_PATH);  //打印输出文件
+  if(!output_file.is_open())
+  {
+    std::cerr << "Error opening file: " << COURSES_OFFERED_PATH << std::endl;
+    return ;
+  }
+
+  // 写入标题
+  output_file << "Title,Number of Units,Quarter" << std::endl;
+  
+  // 写入内容
+  std::vector<Course> need_delete_courses;
+  for(const auto& course : all_courses)
+  {
+    // assert(0);
+    if(course.quarter != "null")
+    {
+      output_file << course.title << ',' << course.number_of_units << ',' << course.quarter << std::endl;
+      need_delete_courses.push_back(course);
+    }
+  }
+  // 删除日期为null的课程
+  for(const auto& course : need_delete_courses)
+  {
+    delete_elem_from_vector(all_courses, course);
+  }
 }
 
 /**
@@ -121,6 +148,27 @@ void write_courses_offered(std::vector<Course> all_courses) {
  */
 void write_courses_not_offered(std::vector<Course> unlisted_courses) {
   /* (STUDENT TODO) Your code goes here... */
+  std::ofstream output_file(COURSES_NOT_OFFERED_PATH);  //打印输出文件
+  if(!output_file.is_open())
+  {
+    std::cerr << "Error opening file: " << COURSES_NOT_OFFERED_PATH << std::endl;
+    return ;
+  }
+
+  // 写入标题
+  output_file << "Title,Number of Units,Quarter" << std::endl;
+
+  // 写入未提供的课程
+  std::vector<Course> offered_courses;
+  for(const auto& course : unlisted_courses)
+  {
+    if(course.quarter == "null")
+    {
+      output_file << course.title << ',' << course.number_of_units << ',' << course.quarter << std::endl;
+      offered_courses.push_back(course);
+    }
+  }
+  return ;
 }
 
 int main() {
