@@ -27,7 +27,7 @@ Forecast compute_forecast(const std::vector<double>& dailyWeather) {
   auto max_t = std::max_element(dailyWeather.begin(), dailyWeather.end());
   double max_temp = *max_t;
 
-  double sum = std::accumulate(dailyWeather.begin(), dailyWeather.end());
+  double sum = std::accumulate(dailyWeather.begin(), dailyWeather.end(), 0.0);
   double avg_t = sum/dailyWeather.size();
   double avg_temp = avg_t;
 
@@ -44,19 +44,16 @@ std::vector<Forecast> get_forecasts(const std::vector<std::vector<double>>& weat
    * STUDENT TODO 2: returns a vector of Forecast structs for the weatherData which contains
    * std::vector<double> which contain values for the weather on that day.
    */
-  auto lambda = [](const std::vector<double>& dailyWeather) {
-    return compute_forecast(dailyWeather)
-  }
   std::vector<Forecast> forecast(weatherData.size());
 
   std::transform(
     weatherData.begin(),
     weatherData.end(),
     forecast.begin(),
-    [](const std::vector<double.& dailyWeather) {
-      return compute_forecast(dailyWeather)
+    [](const std::vector<double>& dailyWeather) {
+      return compute_forecast(dailyWeather);
     }
-  )
+  );
   return forecast;
 }
 
@@ -68,7 +65,7 @@ std::vector<Forecast> get_filtered_data(const std::vector<Forecast>& forecastDat
   auto predicate = [](const Forecast& forecast) {
     return (forecast.max_temp - forecast.min_temp) > kMaxTempRequirement &&
             forecast.avg_temp >= uAvgTempRequirement;
-  }
+  };
   forecastData_temp.erase(std::remove_if(forecastData_temp.begin(), forecastData_temp.end(), predicate), forecastData_temp.end());
   return forecastData_temp;
 }
@@ -88,7 +85,13 @@ std::vector<Forecast> get_shuffled_data(const std::vector<Forecast>& forecastDat
 
 std::vector<Forecast> run_weather_pipeline(const std::vector<std::vector<double>>& weatherData) {
   // STUDENT TODO 5: Put your functions together to run the weather pipeline!
-  
+  std::vector<Forecast> forecasts = get_forecasts(weatherData);
+
+  std::vector<Forecast> filterData = get_filtered_data(forecasts);
+
+  std::vector<Forecast> shuffData = get_shuffled_data(filterData);
+
+  return shuffData;
 }
 
 /* #### Please don't change this line! #### */
