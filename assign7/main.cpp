@@ -52,7 +52,16 @@ template <typename T> struct ListNode {
  */
 template <typename T> unique_ptr<ListNode<T>> create_list(const std::vector<T>& values) {
   /* STUDENT TODO: Implement this method */
-  throw std::runtime_error("Not implemented: createList");
+  // throw std::runtime_error("Not implemented: createList");
+  unique_ptr<ListNode<T>> head = nullptr;
+
+  // unique_ptr独占所有权，不能直接拷贝，所以得从尾部开始构建链表
+  for (int i = values.size() - 1; i >= 0; i--) {
+    auto node = new ListNode<T>(values[i]); // 使用 unique_ptr 创建节点
+    node->next = std::move(head);
+    head = std::move(node);
+}
+  return head;
 }
 
 /**
